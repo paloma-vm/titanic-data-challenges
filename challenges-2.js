@@ -25,7 +25,8 @@
 // Or if property = 'age' -> [40, 26, 22, 28, 23, 45, 21, ...]
 
 const getAllValuesForProperty = (data, property) => {
-	return []
+	return data.map(p => p.fields[property]) // help from ChatGPt, I had p.fields.property, I need square brackets
+
 }
 
 // 2 -------------------------------------------------------------
@@ -36,7 +37,7 @@ const getAllValuesForProperty = (data, property) => {
 // that patch the property and value. 
 
 const filterByProperty = (data, property, value) => {
-	return []
+	return data.filter(p => p.fields[property] === value)
 }
 
 // 3 -------------------------------------------------------------
@@ -45,19 +46,25 @@ const filterByProperty = (data, property, value) => {
 // given property have been removed
 
 const filterNullForProperty = (data, property) => {
-	return []
+	return data.filter(p => p.fields[property] !== undefined)
+
 }
 
 // 4 -------------------------------------------------------------
 // Abstract the sum by creating a function that returns the sum 
 // for any (numeric) property
-// Return the total of all values for a given property.
+// Return the total of all ***** values ***** for a given property. REMEMBER TO USE VALUES!!!!!!!
 // You need to remove any missing values because n + undefined = NaN!
 
-const sumAllProperty = (data, property) => {
-	return 0
-}
 
+
+const sumAllProperty = (data, property) => {
+	//  use reduce
+	const filteredProperty = data.filter(p => p.fields[property] !== undefined)
+	return filteredProperty.reduce((acc, p) => p.fields[property] + acc, 0)
+
+}
+// my notes: we are not mapping first, so must use [property] instead of .property
 
 // 5 -------------------------------------------------------------
 // Count unique values for property. The goal here is return an 
@@ -70,10 +77,30 @@ const sumAllProperty = (data, property) => {
 // at Cherbourg, 77 emabrked at Queenstown, and 2 are undedfined
 
 const countAllProperty = (data, property) => {
-	return {}
+	// reduce(() => {}, {}), but use an object
+	// if property does not exist on the accumulator, add that property with a value of 1
+	//else 
+	//  add 1 to property value
+	// Use reduce with an object as the starting accumulator! 
+
+	let acc = {}
+	const results = data
+	// return {}
+		.reduce((acc, p) => {
+			// do work here
+			const value = p.fields[property]
+			// if nothing is there yet
+			if (acc[value] === undefined) {
+				acc[value] = 1 // starts the count e.g. S: 1
+			} else { // if there was something there
+				acc[value] += 1
+			}
+			return acc 
+		}, {}) // acc
+		// console.log(results)
+		return results
 }
 
-// Use reduce with an object as the starting accumulator! 
 
 
 // 6 ------------------------------------------------------------
@@ -87,7 +114,7 @@ const countAllProperty = (data, property) => {
 const makeHistogram = (data, property, step) => {
 	// list of values that fall into buckets
 	const results = data
-		.filter(p => p.fields[property] !== undefined)
+		/*.filter(p => p.fields[property] !== undefined) Don't want to filter out the undefined */
 		.reduce((acc, p) => {
 			// do work here
 			const value = p.fields[property] // property could be 'age'
@@ -122,7 +149,12 @@ const makeHistogram = (data, property, step) => {
 // to divide each value by the maximum value in the array.
 
 const normalizeProperty = (data, property) => {
-	return []
+	// find max value
+	const values = data.map(p => p.fields[property]).filter(property => property !== undefined)
+	// divide each value by the max value
+	const maxValue = Math.max(...values)
+	const normalizedProperties = values.map(value => value / maxValue) // a new array
+	return normalizedProperties
 }
 
 // Normalizing is an important process that can make many other
@@ -140,9 +172,24 @@ const normalizeProperty = (data, property) => {
 // an array of all of the unique values under that property. 
 // For example if the property string were "sex" this function 
 // would return ['male', 'female']
+// embarked ['S', 'C', 'Q', 'undefined']
 
+// could reduce((acc, p) => {...}, {})
+// unique times that a value appears
 const getUniqueValues = (data, property) => {
-	return []
+	let acc = {}
+	const results = data
+		.reduce((acc, p) => {
+			const value = String(p.fields[property]) // help from ChatGPT
+			// if nothing is there yet
+			if (acc[value] === undefined) {
+				acc[value] = true
+			}
+			return acc
+		}, {})
+
+		const uniqueValues = Object.keys(results) // returns just the keys
+		return uniqueValues
 }
 
 // There are a couple ways to do this. 
