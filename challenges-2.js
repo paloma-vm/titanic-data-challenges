@@ -149,11 +149,31 @@ const makeHistogram = (data, property, step) => {
 // to divide each value by the maximum value in the array.
 
 const normalizeProperty = (data, property) => {
-	// find max value
+	
 	const values = data.map(p => p.fields[property]).filter(property => property !== undefined)
-	// divide each value by the max value
+	// find max value
+	
 	const maxValue = Math.max(...values)
-	const normalizedProperties = values.map(value => value / maxValue) // a new array
+	
+	const normalizedProperties = values.map(value => {
+		const normalizedValue = value / maxValue
+		return normalizedValue
+	})
+
+	/* The code below will not pass the test
+	I have tried rounding, EPSILON, etc.  How to get it to pass?  Does the test need to be changed?*/
+
+	/* for negative or data that doesn't start at zero, subtract the min and divide by the range */
+	/* find min value */
+	// const minValue = Math.min(...values)
+	// console.log(minValue)
+	/* calculate the range of values */
+	// const range = maxValue - minValue
+	// const normalizedProperties = values.map(value => {
+	// 	const normalizedValue = (value - minValue) / range
+	// 	return normalizedValue
+	// })
+	
 	return normalizedProperties
 }
 
@@ -177,18 +197,15 @@ const normalizeProperty = (data, property) => {
 // could reduce((acc, p) => {...}, {})
 // unique times that a value appears
 const getUniqueValues = (data, property) => {
-	let acc = {}
-	const results = data
+	const uniqueValues = data
 		.reduce((acc, p) => {
-			const value = String(p.fields[property]) // help from ChatGPT
-			// if nothing is there yet
-			if (acc[value] === undefined) {
-				acc[value] = true
+			const value = p.fields[property]
+			if (!acc.includes(value)) { // if acc does not include the value
+				acc.push(value) // add the value to acc array
 			}
 			return acc
-		}, {})
+		}, [])
 
-		const uniqueValues = Object.keys(results) // returns just the keys
 		return uniqueValues
 }
 
